@@ -42,9 +42,10 @@ namespace Graph {
 	private: ZedGraph::ZedGraphControl^  zedGraphControl1;
 	private: System::Windows::Forms::Button^  button1;
 	private: System::Windows::Forms::DataGridView^  dataGridView1;
-	private: System::Windows::Forms::DataGridViewTextBoxColumn^  X;
-	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F_1;
+
+
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F_2;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F_3;
 	private: System::Windows::Forms::Label^  label1;
 	private: System::Windows::Forms::TextBox^  textBox1;
 	private: System::Windows::Forms::Label^  label2;
@@ -54,6 +55,11 @@ namespace Graph {
 	private: System::Windows::Forms::Label^ label4;
 	private: System::Windows::Forms::TextBox^ textBox4;
 	private: System::Windows::Forms::TextBox^  textBox5;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  X;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F_1;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F2;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F3;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  F4;
 
 
 
@@ -90,7 +96,10 @@ namespace Graph {
 			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
 			this->X = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 			this->F_1 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
-			this->F_2 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->F2 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->F3 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->F4 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->F_3 = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
@@ -133,7 +142,10 @@ namespace Graph {
 			// dataGridView1
 			// 
 			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->dataGridView1->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(2) { this->X, this->F_1 });
+			this->dataGridView1->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(5) {
+				this->X, this->F_1,
+					this->F2, this->F3, this->F4
+			});
 			this->dataGridView1->Location = System::Drawing::Point(839, 17);
 			this->dataGridView1->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
 			this->dataGridView1->Name = L"dataGridView1";
@@ -143,21 +155,45 @@ namespace Graph {
 			// 
 			// X
 			// 
-			this->X->HeaderText = L"№";
+			this->X->HeaderText = L"i";
 			this->X->Name = L"X";
 			this->X->ReadOnly = true;
 			this->X->Width = 50;
 			// 
 			// F_1
 			// 
-			this->F_1->HeaderText = L"Колличество бросков до победы";
+			this->F_1->HeaderText = L"Yi";
 			this->F_1->Name = L"F_1";
 			this->F_1->ReadOnly = true;
-			this->F_1->Width = 300;
+			this->F_1->Width = 50;
 			// 
-			// F_2
+			// F2
 			// 
-			this->F_2->Name = L"F_2";
+			this->F2->HeaderText = L"Xi";
+			this->F2->Name = L"F2";
+			this->F2->ReadOnly = true;
+			this->F2->Width = 50;
+			// 
+			// F3
+			// 
+			this->F3->HeaderText = L"Xi/n";
+			this->F3->Name = L"F3";
+			this->F3->ReadOnly = true;
+			this->F3->Width = 50;
+			// 
+			// F4
+			// 
+			this->F4->HeaderText = L"P(i)";
+			this->F4->Name = L"F4";
+			this->F4->ReadOnly = true;
+			this->F4->Width = 50;
+			// 
+			// F_3
+			// 
+			this->F_3->HeaderText = L"Xi/N";
+			this->F_3->Name = L"F_3";
+			this->F_3->ReadOnly = true;
+			this->F_3->Width = 50;
 			// 
 			// label1
 			// 
@@ -176,7 +212,7 @@ namespace Graph {
 			this->textBox1->Name = L"textBox1";
 			this->textBox1->Size = System::Drawing::Size(170, 26);
 			this->textBox1->TabIndex = 4;
-			this->textBox1->Text = L"0,05";
+			this->textBox1->Text = L"0,5";
 			// 
 			// label2
 			// 
@@ -195,7 +231,7 @@ namespace Graph {
 			this->textBox2->Name = L"textBox2";
 			this->textBox2->Size = System::Drawing::Size(168, 26);
 			this->textBox2->TabIndex = 6;
-			this->textBox2->Text = L"0,05";
+			this->textBox2->Text = L"0,5";
 			// 
 			// label3
 			// 
@@ -277,9 +313,11 @@ namespace Graph {
 		}
 #pragma endregion
 	private: 
-		double f1(double x, double y){
+		double f1(double x, double y, double &p){
 			int res = 0;
 			int f = 0;
+			double sum = 1; // начальный коэф, нужен для вычисления разности 1-"сумма"
+			p = x; // вероятность закончить за 0 бросков равна вероятности попадания первого игрока
 			while (f == 0)
 			{
 				double ff1 = (double)rand() / RAND_MAX;
@@ -294,10 +332,14 @@ namespace Graph {
 					{
 						f = 1;
 						res++;
+						sum = sum - p;
+						p = sum * (x + (1 - x) * y);
 					}
 					else
 					{
 						res++;
+						sum = sum - p;
+						p = sum * (x + (1 - x) * y);
 					}
 				}
 			}
@@ -320,7 +362,8 @@ namespace Graph {
 		double p1 = Convert::ToDouble(textBox1->Text); // Вероятность попадания 1 игрока
 		double p2 = Convert::ToDouble(textBox2->Text); // Вероятность попадания 2 игрока
 
-		long double h = 1.0 / Convert::ToDouble(textBox3->Text); // Шаг для сетки
+		double h = 1.0 / Convert::ToDouble(textBox3->Text); // Шаг для сетки
+		double hh = 1.0 / h;
 
 		textBox4->Text = Convert::ToString(p1 + (1 - p1) * p2);  // Вероятность закончить игру
 
@@ -330,19 +373,42 @@ namespace Graph {
 		double ymin_limit = -1.0;
 		double ymax_limit = 100.0;
 */
-		// Список точек
+		// Список точек 
 		int i = 0;
+		int a[1100];
+		for (int l = 0; l < 1100; l++)a[l] = 0;
 		dataGridView1->Rows->Clear();
 		for (double x = xmin + h; x <= xmax; x += h)
 		{
+			double p = 0;
 			//Добавление на график
-			f1_list->Add(x, f1(p1, p2));
+			f1_list->Add(x, f1(p1, p2, p));
 			//Печать в таблицу
 			dataGridView1->Rows->Add();
-			dataGridView1->Rows[i]->Cells[0]->Value = x * (1/h); 		// № эксперимента	
-			dataGridView1->Rows[i]->Cells[1]->Value = f1(p1, p2);		// случайная велична
+			dataGridView1->Rows[i]->Cells[0]->Value = x * (1.0/h);
+			int k = f1(p1, p2, p);// № эксперимента	
+			a[k]++;
+			dataGridView1->Rows[i]->Cells[4]->Value = p;
+			dataGridView1->Rows[i]->Cells[1]->Value = k;		// случайная велична
 			i++;
 		}
+		i = 0;
+		for (; i < hh-1; i++)
+		{
+			for (int k = 0; k < 50; k++)
+			{
+				int kk = (int)dataGridView1->Rows[i]->Cells[1]->Value;
+				if (kk == k)
+				{
+					dataGridView1->Rows[i]->Cells[2]->Value = a[k];
+					dataGridView1->Rows[i]->Cells[3]->Value = a[k] / (hh-1);
+				}
+			}
+		}
+		/*for (int l = 0; l < (1.0 / h); l++)
+		{
+			dataGridView1->Rows[l]->Cells[2] -> Value = a[l];
+		}*/
 		LineItem Curve1 = panel->AddCurve("F1(x)", f1_list, Color::Red,SymbolType::Plus);
 
 		// Устанавливаем интересующий нас интервал по оси X
