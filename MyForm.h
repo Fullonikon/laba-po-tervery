@@ -495,12 +495,16 @@ namespace Graph {
 		double f1count = 0;
 		double f2count = 0;
 		int lll = 0;
+		int xxmin = 100;
+		int xxmax = 0;
 		for (int j = 0; j < mk+1; j++)
 		{
 			double mm = fabs((double)dataGridView1->Rows[j]->Cells[3]->Value - (double)dataGridView1->Rows[j]->Cells[2]->Value);
 			if (mm > m)m = mm;
 			if ((double)dataGridView1->Rows[j]->Cells[2]->Value != 0.0)
 			{
+				if ((int)dataGridView1->Rows[j]->Cells[0]->Value < xxmin)xxmin = (int)dataGridView1->Rows[j]->Cells[0]->Value;
+				if ((int)dataGridView1->Rows[j]->Cells[0]->Value > xxmax)xxmax = (int)dataGridView1->Rows[j]->Cells[0]->Value;
 				f1count = f1count + (double)dataGridView1->Rows[j]->Cells[2]->Value;
 				f2count = f2count + (double)dataGridView1->Rows[j]->Cells[3]->Value;
 				f1_list->Add(j - 1, f1count);
@@ -531,6 +535,10 @@ namespace Graph {
 		dataGridView1->Rows[7]->Cells[6]->Value = fabs(dis - dis1);
 		dataGridView1->Rows[4]->Cells[5]->Value = "S^2";
 		dataGridView1->Rows[4]->Cells[6]->Value = "D";
+		dataGridView1->Rows[9]->Cells[5]->Value = "R";
+		dataGridView1->Rows[9]->Cells[6]->Value = Convert::ToString(xxmax-xxmin);
+		dataGridView1->Rows[10]->Cells[5]->Value = "Me";
+		dataGridView1->Rows[10]->Cells[6]->Value = Convert::ToString((xxmax - xxmin)/2);
 		textBox4->Text = Convert::ToString(m);
 		i = 0;
 		/*for (; i < hh-1; i++)
